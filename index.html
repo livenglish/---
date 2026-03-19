@@ -1,383 +1,235 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Neon Score Editor v2</title>
-<style>
-  :root { color-scheme: dark; }
-  * { box-sizing: border-box; }
-  
-  body {
-    margin: 0; padding: 20px;
-    font-family: 'Segoe UI', sans-serif;
-    background: #0f0f1a;
-    color: #eee;
-    display: flex;
-    justify-content: center;
-  }
+  <meta charset="UTF-8" />
+  <title>Scoreboard</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-  .container {
-    display: flex;
-    gap: 20px;
-    max-width: 1000px;
-    width: 100%;
-    flex-wrap: wrap;
-  }
+    #NEON_SCORE_ROOT {
+      width: 100%;
+      max-width: 700px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at center, #1a0b2e 0%, #050510 100%);
+      color: #fff;
+      overflow: hidden;
+      border-radius: 12px;
+      box-sizing: border-box;
+      user-select: none;
+      padding: 20px;
+    }
 
-  /* Панель настроек */
-  .settings {
-    flex: 1;
-    min-width: 300px;
-    background: #1a1a2e;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #333;
-  }
+    .scoreboard {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      width: 100%;
+      justify-content: space-around;
+    }
 
-  .group {
-    margin-bottom: 15px;
-    background: rgba(255,255,255,0.03);
-    padding: 10px;
-    border-radius: 8px;
-  }
+    .player-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 15px;
+      border-radius: 15px;
+      border: 1px solid rgba(188, 19, 254, 0.3);
+      box-shadow: 0 0 15px rgba(188, 19, 254, 0.1);
+      transition: box-shadow 0.3s ease;
+      flex: 1;
+      min-width: 120px;
+    }
 
-  label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 0.9em;
-    color: #aaa;
-  }
+    .player-card:hover {
+      box-shadow: 0 0 25px rgba(0, 243, 255, 0.2);
+      border-color: rgba(0, 243, 255, 0.5);
+    }
 
-  input[type="text"], input[type="number"] {
-    width: 100%;
-    padding: 8px;
-    background: #0f0f1a;
-    border: 1px solid #444;
-    color: white;
-    border-radius: 4px;
-  }
+    input.player-name {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid #bc13fe;
+      color: #00f3ff;
+      font-size: 1.2rem;
+      text-align: center;
+      width: 100%;
+      outline: none;
+      font-weight: bold;
+      text-shadow: 0 0 5px #bc13fe;
+      margin-bottom: 10px;
+      transition: 0.3s;
+    }
+    
+    input.player-name:focus {
+      border-color: #00f3ff;
+      text-shadow: 0 0 8px #00f3ff;
+    }
 
-  .row { display: flex; gap: 10px; align-items: center; }
-  
-  input[type="color"] {
-    border: none; width: 40px; height: 30px; cursor: pointer; background: none;
-  }
+    .score-display {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 0 10px #bc13fe, 0 0 20px #bc13fe;
+      margin: 10px 0;
+      font-variant-numeric: tabular-nums;
+      transition: transform 0.15s ease;
+    }
 
-  input[type="range"] { flex: 1; cursor: pointer; }
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
 
-  /* Превью */
-  .preview-area {
-    flex: 1.5;
-    min-width: 350px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+    button {
+      cursor: pointer;
+      border: 2px solid #00f3ff;
+      background: transparent;
+      color: #00f3ff;
+      font-size: 1.2rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 0 5px rgba(0, 243, 255, 0.2);
+    }
 
-  .preview-box {
-    background: #000; /* Имитация черного слайда */
-    background-image: radial-gradient(#222 1px, transparent 1px);
-    background-size: 20px 20px;
-    height: 300px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #333;
-    overflow: hidden;
-    position: relative;
-  }
+    button:hover {
+      background: #00f3ff;
+      color: #000;
+      box-shadow: 0 0 15px #00f3ff;
+    }
 
-  /* Поле кода */
-  textarea {
-    width: 100%;
-    height: 150px;
-    background: #111;
-    color: #0f0;
-    border: 1px solid #333;
-    padding: 10px;
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 0.8em;
-    resize: vertical;
-  }
+    button:active {
+      transform: scale(0.95);
+    }
 
-  button.copy-btn {
-    width: 100%;
-    padding: 10px;
-    background: #00d2ff;
-    color: #000;
-    border: none;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 5px;
-  }
-  button.copy-btn:hover { background: #66e0ff; }
+    button.btn-minus {
+      border-color: #ff0055;
+      color: #ff0055;
+      box-shadow: 0 0 5px rgba(255, 0, 85, 0.2);
+    }
 
-  /* Стили самого виджета (для превью) */
-  .widget-preview {
-    padding: 20px 30px;
-    border-radius: 15px;
-    display: flex;
-    gap: 30px;
-    text-align: center;
-    backdrop-filter: blur(4px); /* Эффект стекла */
-    transition: all 0.2s;
-  }
-  
-  .p-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-  .p-name { font-weight: 600; font-size: 1.1em; }
-  .p-score { font-weight: 700; line-height: 1; margin: 5px 0; }
-  .p-btns { display: flex; gap: 10px; }
-  .btn {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.1);
-    color: inherit;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    font-size: 18px; line-height: 1;
-    user-select: none;
-  }
-</style>
+    button.btn-minus:hover {
+      background: #ff0055;
+      color: #fff;
+      box-shadow: 0 0 15px #ff0055;
+    }
+
+    .vs {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.3);
+      font-style: italic;
+    }
+
+    /* Центральная кнопка сброса */
+    .center-reset {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .reset-btn {
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.7);
+      border-radius: 20px;
+      width: auto;
+      height: auto;
+      padding: 5px 20px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .reset-btn:hover {
+      border-color: #fff;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+  </style>
 </head>
 <body>
-
-<div class="container">
-  
-  <!-- НАСТРОЙКИ -->
-  <div class="settings">
-    <h3>Настройки</h3>
-    
-    <div class="group">
-      <label>Имена игроков</label>
-      <input type="text" id="name1" value="Team 1" style="margin-bottom:5px">
-      <input type="text" id="name2" value="Team 2">
-    </div>
-
-    <div class="group">
-      <label>Внешний вид</label>
-      <div class="row">
-        <span>Текст:</span> <input type="color" id="colText" value="#ffffff">
-        <span>Неон:</span> <input type="color" id="colNeon" value="#00e1ff">
-      </div>
-      <div class="row" style="margin-top:10px">
-        <span>Фон:</span> <input type="color" id="colBg" value="#000000">
-      </div>
-      <label style="margin-top:5px">Прозрачность фона: <span id="opVal">50%</span></label>
-      <div class="row">
-        <input type="range" id="bgOpacity" min="0" max="100" value="50">
-      </div>
-    </div>
-
-    <div class="group">
-      <label>Размер цифр (px)</label>
-      <input type="number" id="fontSize" value="60">
-    </div>
-
-    <div class="group">
-      <label>Стартовый счет</label>
-      <input type="number" id="startVal" value="0">
-    </div>
-  </div>
-
-  <!-- ПРЕВЬЮ И КОД -->
-  <div class="preview-area">
-    <h3>Предпросмотр</h3>
-    <div class="preview-box">
-      <!-- Сюда рендерится превью -->
-      <div id="widget" class="widget-preview">
-        <div class="p-col">
-          <div class="p-name" id="prevN1">Team 1</div>
-          <div class="p-score" id="prevS1">0</div>
-          <div class="p-btns">
-            <div class="btn">−</div><div class="btn">+</div>
-          </div>
+  <div id="NEON_SCORE_ROOT">
+    <div class="scoreboard">
+      <div class="player-card">
+        <input type="text" class="player-name" value="Игрок 1">
+        <div class="score-display" id="score1">0</div>
+        <div class="controls">
+          <button class="btn-minus" onclick="changeScore(1, -1)">−</button>
+          <button class="btn-plus" onclick="changeScore(1, 1)">+</button>
         </div>
-        <div class="p-col">
-          <div class="p-name" id="prevN2">Team 2</div>
-          <div class="p-score" id="prevS2">0</div>
-          <div class="p-btns">
-            <div class="btn">−</div><div class="btn">+</div>
-          </div>
+      </div>
+
+      <div class="vs">VS</div>
+
+      <div class="player-card">
+        <input type="text" class="player-name" value="Игрок 2">
+        <div class="score-display" id="score2">0</div>
+        <div class="controls">
+          <button class="btn-minus" onclick="changeScore(2, -1)">−</button>
+          <button class="btn-plus" onclick="changeScore(2, 1)">+</button>
         </div>
       </div>
     </div>
 
-    <h3>Код для Genially</h3>
-    <textarea id="output" readonly></textarea>
-    <button class="copy-btn" onclick="copyCode()">Копировать код</button>
-  </div>
-</div>
-
-<script>
-// Элементы управления
-const ui = {
-  n1: document.getElementById('name1'),
-  n2: document.getElementById('name2'),
-  cText: document.getElementById('colText'),
-  cNeon: document.getElementById('colNeon'),
-  cBg: document.getElementById('colBg'),
-  op: document.getElementById('bgOpacity'),
-  fs: document.getElementById('fontSize'),
-  sv: document.getElementById('startVal'),
-  opVal: document.getElementById('opVal')
-};
-
-// Элементы превью
-const prev = {
-  box: document.getElementById('widget'),
-  n1: document.getElementById('prevN1'),
-  n2: document.getElementById('prevN2'),
-  s1: document.getElementById('prevS1'),
-  s2: document.getElementById('prevS2')
-};
-
-// Конвертер hex в rgb
-function hexToRgb(hex) {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null;
-}
-
-function update() {
-  // Обновляем тексты
-  prev.n1.textContent = ui.n1.value;
-  prev.n2.textContent = ui.n2.value;
-  prev.s1.textContent = ui.sv.value;
-  prev.s2.textContent = ui.sv.value;
-  ui.opVal.textContent = ui.op.value + '%';
-
-  // Собираем цвета
-  const rgb = hexToRgb(ui.cBg.value);
-  const bgString = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${ui.op.value / 100})`;
-  const neonString = `0 0 10px ${ui.cNeon.value}, 0 0 20px ${ui.cNeon.value}`;
-  
-  // Применяем стили к превью
-  prev.box.style.backgroundColor = bgString;
-  prev.box.style.color = ui.cText.value;
-  
-  const scores = document.querySelectorAll('.p-score');
-  scores.forEach(s => {
-    s.style.fontSize = ui.fs.value + 'px';
-    s.style.textShadow = neonString;
-  });
-  
-  // Кнопки превью тоже красим
-  document.querySelectorAll('.btn').forEach(b => {
-    b.style.borderColor = ui.cNeon.value;
-    b.style.color = ui.cText.value;
-  });
-
-  generateCode(bgString, neonString);
-}
-
-function generateCode(bgVal, neonVal) {
-  const code = `
-<div id="app-root" style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;">
-  
-  <style>
-    /* Стили */
-    .score-card {
-      background-color: ${bgVal};
-      padding: 20px 30px;
-      border-radius: 20px;
-      display: flex;
-      gap: 40px;
-      font-family: sans-serif;
-      color: ${ui.cText.value};
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-    }
-    .player { display: flex; flex-direction: column; align-items: center; }
-    .name { font-size: 18px; margin-bottom: 5px; font-weight: bold; opacity: 0.9; }
-    .score-val { 
-      font-size: ${ui.fs.value}px; 
-      font-weight: bold; 
-      margin: 5px 0;
-      text-shadow: ${neonVal};
-      line-height: 1.1;
-    }
-    .controls { display: flex; gap: 10px; margin-top: 5px; }
-    .act-btn {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid ${ui.cNeon.value};
-      color: ${ui.cText.value};
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      transition: all 0.2s;
-      user-select: none;
-    }
-    .act-btn:hover { background: ${ui.cNeon.value}; color: #000; }
-    .act-btn:active { transform: scale(0.95); }
-  </style>
-
-  <div class="score-card">
-    <!-- Игрок 1 -->
-    <div class="player">
-      <div class="name">${ui.n1.value}</div>
-      <div class="score-val" id="s1">${ui.sv.value}</div>
-      <div class="controls">
-        <div class="act-btn" onclick="window.changeScore('s1', -1)">−</div>
-        <div class="act-btn" onclick="window.changeScore('s1', 1)">+</div>
-      </div>
-    </div>
-
-    <!-- Игрок 2 -->
-    <div class="player">
-      <div class="name">${ui.n2.value}</div>
-      <div class="score-val" id="s2">${ui.sv.value}</div>
-      <div class="controls">
-        <div class="act-btn" onclick="window.changeScore('s2', -1)">−</div>
-        <div class="act-btn" onclick="window.changeScore('s2', 1)">+</div>
-      </div>
+    <!-- Центральная кнопка сброса -->
+    <div class="center-reset">
+      <button class="reset-btn" onclick="resetScores()">Обнулить</button>
     </div>
   </div>
 
   <script>
-    // Глобальная функция для смены счета
-    window.changeScore = function(id, delta) {
-      var el = document.getElementById(id);
-      if(!el) return;
-      var current = parseInt(el.textContent);
-      if(isNaN(current)) current = 0;
-      var newVal = current + delta;
-      // Если не хотите отрицательные числа, раскомментируйте строку ниже:
-      // if(newVal < 0) newVal = 0;
-      el.textContent = newVal;
-    };
-  <\/script>
-</div>
-`;
-  document.getElementById('output').value = code.trim();
-}
+    let scores = { p1: 0, p2: 0 };
+    const scoreEl1 = document.getElementById('score1');
+    const scoreEl2 = document.getElementById('score2');
 
-function copyCode() {
-  document.getElementById('output').select();
-  document.execCommand('copy');
-  const btn = document.querySelector('.copy-btn');
-  const old = btn.textContent;
-  btn.textContent = "Скопировано!";
-  setTimeout(() => btn.textContent = old, 1500);
-}
+    function changeScore(playerNum, delta) {
+      if (playerNum === 1) {
+        scores.p1 += delta;
+        if (scores.p1 < 0) scores.p1 = 0;
+        animateValue(scoreEl1, scores.p1);
+      } else {
+        scores.p2 += delta;
+        if (scores.p2 < 0) scores.p2 = 0;
+        animateValue(scoreEl2, scores.p2);
+      }
+    }
 
-// Слушатели событий
-Object.values(ui).forEach(el => {
-  el.addEventListener('input', update);
-});
+    function resetScores() {
+      scores.p1 = 0;
+      scores.p2 = 0;
+      animateValue(scoreEl1, 0);
+      animateValue(scoreEl2, 0);
+    }
 
-// Инициализация
-update();
-
-</script>
+    // Анимация "дёргания" цифр
+    function animateValue(element, value) {
+      element.innerText = value;
+      element.style.transform = "scale(1.2)";
+      setTimeout(() => {
+        element.style.transform = "scale(1)";
+      }, 150);
+    }
+  </script>
 </body>
 </html>
